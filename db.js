@@ -1,4 +1,4 @@
-const exampleRetros = [{ id: "Example retro 1" }, { id: "Example retro 2" }, { id: "Example retro 3" }];
+let exampleRetros = [{ id: "Example retro 1", opinions: [] }, { id: "Example retro 2", opinions: []  }, { id: "Example retro 3", opinions: []  }];
 
 init = () => {
   console.log("Inserting examples for testing purposes");
@@ -18,12 +18,17 @@ getRetros = () => {
   return exampleRetros;
 };
 
+getRetro = (id) => {
+  return exampleRetros.find((retro) => retro.id === id);
+}
+
 insertRetro = async (retroName) => {
   // to be developed when db attached
 };
 
-insertUserOpinions = async (opinions) => {
-  // to be developed when db attached
+insertUserOpinions = async (id, opinions) => {
+  const index = exampleRetros.findIndex((retro => retro.id === id));
+  exampleRetros[index].opinions = exampleRetros[index].opinions.concat(opinions);
 };
 
 getAllOpinions = async () => {
@@ -33,5 +38,7 @@ getAllOpinions = async () => {
 init();
 
 module.exports = {
+  getRetro,
   getRetros,
+  insertUserOpinions,
 };

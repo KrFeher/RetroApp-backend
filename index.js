@@ -1,37 +1,38 @@
-const express = require('express');
+const express = require("express");
 const app = express();
 const port = process.env.PORT || 5000;
-const morgan = require('morgan');
-const cors = require('cors');
-const db = require('./db.js');
+const morgan = require("morgan");
+const cors = require("cors");
+const db = require("./db.js");
 
 app.use(express.json());
-app.use(morgan('tiny'));
+app.use(morgan("tiny"));
 app.use(cors());
 
-app.get('/auth/login/', async (req, res) => {
+app.get("/auth/login/", async (req, res) => {
   const opinions = await db.getOpinions();
   res.send(opinions);
 });
 
-app.get('/api/test', async (req, res) => {
-  res.send('Test successful');
-});
-
-app.get('/api/retros', async (req, res) => {
+app.get("/api/retros", async (req, res) => {
   const retros = await db.getRetros();
   res.send(retros);
 });
 
-// app.post('/api/opinions/', async (req, res) => {
-//   console.log(req.body);
-//   const opinion = await db.insertManyOpinions(req.body);
-//   const opinions = await db.getOpinions();
-//   console.log(opinion);
-//   console.log(opinions);
-//   io.emit('new-opinions', opinions);
-//   res.send(opinion);
-// });
+app.get("/api/retro/:id", async (req, res) => {
+  const id = req.params.id;
+  const retro = await db.getRetro(id);
+  res.send(retro);
+});
 
+app.post("/api/retro/opinions/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    await db.insertUserOpinions(id, req.body.opinions);
+    res.sendStatus(200);
+  } catch (error) {
+    res.sendStatus(500);
+  }
+});
 
 app.listen(port, () => console.log(`Listening to port ${port}...`));
