@@ -35,4 +35,34 @@ app.post("/api/retro/opinions/:id", async (req, res) => {
   }
 });
 
+app.post("/api/retro/opinions/votes/:id", async (req, res) => {
+  try {
+    const retroId = req.params.id;
+    await db.addVotesToOpinions(retroId, req.body.votedOpinions);
+    res.sendStatus(200);
+  } catch (error) {
+    res.sendStatus(500);
+  }
+});
+
+app.post("/api/retro/:id", async (req, res) => {
+  try {
+    const retroId = req.params.id;
+    await db.addRetro(retroId);
+    res.sendStatus(200);
+  } catch (error) {
+    res.sendStatus(500);
+  }
+});
+
+app.delete("/api/retro/:id", async (req, res) => {
+  try {
+    const retroId = req.params.id;
+    await db.deleteRetro(retroId);
+    res.sendStatus(200);
+  } catch (error) {
+    res.sendStatus(500);
+  }
+});
+
 app.listen(port, () => console.log(`Listening to port ${port}...`));
