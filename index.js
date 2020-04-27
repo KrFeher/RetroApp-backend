@@ -15,14 +15,14 @@ app.get("/auth/login/", async (req, res) => {
 });
 
 app.get("/api/retros", async (req, res) => {
-  const retros = await db.getRetros();
-  res.send(retros);
+  const result = await db.getRetros();
+  result.error ? res.sendStatus(500) : res.send(result.retros);
 });
 
 app.get("/api/retro/:id", async (req, res) => {
   const id = req.params.id;
-  const retro = await db.getRetro(id);
-  res.send(retro);
+  const result = await db.getRetro(id);
+  result.error ? res.sendStatus(500) : res.send(result.retro);
 });
 
 app.post("/api/retro/opinions/:id", async (req, res) => {
