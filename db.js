@@ -18,20 +18,8 @@ init = () => {
       if (!allCollections.find((collection) => collection.name === "retro")) {
         console.log("Retro collection does not exist. Reacreating it...");
         await retrodb.createCollection("retro");
-        if (allCollections.find((collection) => collection.name === "opinion")) {
-          console.log("Wiping opinion collection...");
-          await retrodb.collection("opinion").deleteMany(); // no point keeping opinions without old retros
-        } else {
-          console.log("Opinion collection does not exist. Reacreating it...");
-          await retrodb.createCollection("opinion");
-        }
         insertExamples(retrodb);
       }
-      if (!allCollections.find((collection) => collection.name === "opinion")) {
-        console.log("Opinion collection does not exist. Reacreating it...");
-        await retrodb.createCollection("opinion");
-      }
-      // insertExamples(retrodb);
     } catch (error) {
       console.log(error);
     }
@@ -75,7 +63,7 @@ getRetro = async (id) => {
   try {
     await client.connect();
     const retrodb = client.db("retrodb");
-    retro = await retrodb.collection("retro").findOne({ _id: id});
+    retro = await retrodb.collection("retro").findOne({ _id: id });
     if (!retro) error = true;
   } catch (err) {
     console.log(err);
@@ -91,7 +79,7 @@ deleteRetro = async (id) => {
   try {
     await client.connect();
     const retrodb = client.db("retrodb");
-    await retrodb.collection("retro").deleteOne({_id : id});
+    await retrodb.collection("retro").deleteOne({ _id: id });
   } finally {
     client.close();
   }
@@ -102,30 +90,40 @@ addRetro = async (id) => {
   try {
     await client.connect();
     const retrodb = client.db("retrodb");
-    await retrodb.collection("retro").insertOne({_id : id, opinions: []});
+    await retrodb.collection("retro").insertOne({ _id: id, opinions: [] });
   } finally {
     client.close();
   }
 };
 
 insertUserOpinions = async (retroId, opinions) => {
-  const opinionsWithInitialVotes = opinions.map((opinion) => {
-    return { ...opinion, votes: 0 };
-  });
-  const index = exampleRetros.findIndex((retro) => retro.id === retroId);
-  exampleRetros[index].opinions = exampleRetros[index].opinions.concat(opinionsWithInitialVotes);
+  const opinionWithVotes = opinions.map(opinion => ({...opinion, votes: 0}))
+  const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+  try {
+    await client.connect();
+    const retrodb = client.db("retrodb");
+    await retrodb.collection("retro").update({ _id: retroId }, { $addToSet: { opinions: { $each: opinionWithVotes } } });
+  } finally {
+    client.close();
+  }
 };
 
 addVotesToOpinions = async (retroId, votedOpinions) => {
-  const index = exampleRetros.findIndex((retro) => retro.id === retroId);
-  const choosenRetro = exampleRetros[index];
-
-  votedOpinions.forEach((opinionId) => {
-    const foundOpinion = choosenRetro.opinions.find((opinion) => opinion.id === opinionId);
-    if (foundOpinion) {
-      foundOpinion.votes = foundOpinion.votes ? foundOpinion.votes + 1 : 1;
-    }
-  });
+  const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+  try {
+    await client.connect();
+    const retrodb = client.db("retrodb");
+    await retrodb.collection("retro").update(
+      { _id: retroId },
+      { $inc: { "opinions.$[opinion].votes" : 1 } },
+      {
+        multi: true,
+        arrayFilters: [ { "opinion._id": { $in: votedOpinions } } ]
+      }
+   )
+  } finally {
+    client.close();
+  }
 };
 
 init();
