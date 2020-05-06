@@ -9,6 +9,10 @@ function eventsHandler(req, res, next) {
   };
   res.writeHead(200, headers);
 
+  // 1st connection message
+  const data = `data: Connected\n\n`;
+  res.write(data);
+
   // add new client
   const clientId = Date.now();
   const newClient = {
