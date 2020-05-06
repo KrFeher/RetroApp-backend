@@ -4,8 +4,11 @@ function eventsHandler(req, res, next) {
   // sse required headers
   const headers = {
     "Content-Type": "text/event-stream",
-    Connection: "keep-alive",
+    "Connection": "keep-alive",
     "Cache-Control": "no-cache",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Expose-Headers": "*",
+    "Access-Control-Allow-Credentials": "true",
   };
   res.writeHead(200, headers);
 
@@ -29,7 +32,7 @@ function eventsHandler(req, res, next) {
 }
 
 function broadcastMessage(data) {
-  console.log("Broadcasting message to all clients...")
+  console.log("Broadcasting message to all clients...");
   connectedClients.forEach((c) => c.res.write(`data: ${JSON.stringify(data)}\n\n`));
 }
 
