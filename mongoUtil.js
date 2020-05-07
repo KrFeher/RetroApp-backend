@@ -8,6 +8,7 @@ let _db;
 
 module.exports = {
   init: () => {
+    console.log(`Trying to connect to ${uri} with db name $${dbName}`)
     client.connect( uri,  { useNewUrlParser: true, useUnifiedTopology: true }, async ( err, client ) => {
       if (err) throw err;
 
