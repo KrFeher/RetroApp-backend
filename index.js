@@ -10,10 +10,6 @@ app.use(express.json());
 app.use(morgan("tiny"));
 app.use(cors());
 
-// todo
-app.get("/auth/login/", async (req, res) => {
-});
-
 app.get("/api/retros", async (req, res) => {
   const result = await db.getRetros();
   result.error ? res.sendStatus(500) : res.send(result.retros);
@@ -77,6 +73,7 @@ app.delete("/api/retro/:id", async (req, res) => {
   }
 });
 
+// this handles the 'server-side-events' messages from server
 app.get('/api/events', eventsHandler);
 
 app.listen(port, () => console.log(`Listening to port ${port}...`));
