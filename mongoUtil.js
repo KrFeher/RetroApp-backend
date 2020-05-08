@@ -1,9 +1,7 @@
-var config = require('config');
-
 const client = require("mongodb").MongoClient;
-const userName = config.db_username;
-const password = config.db_password;
-const dbName = config.db_name;
+const userName = process.env.TPICAP_DB_USERNAME;
+const password = process.env.TPICAP_DB_PASSWORD;
+const dbName = process.env.TPICAP_DB_NAME;
 const constructedUrl = `mongodb+srv://${userName}:${password}@cluster-1-rxwrb.mongodb.net/${dbName}?retryWrites=true&w=majority`
 
 let _db;
