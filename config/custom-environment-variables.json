@@ -1,3 +1,5 @@
 {
-  "db_url": "TPICAP_RETRO_DB_URL"
+  "db_name": "TPICAP_DB_NAME",
+  "db_username": "TPICAP_DB_USERNAME",
+  "db_password": "TPICAP_DB_PASSWORD"
 }
